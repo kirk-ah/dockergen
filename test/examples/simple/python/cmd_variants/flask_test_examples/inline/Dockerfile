@@ -8,10 +8,19 @@ RUN python3 -m venv /opt/dockerenv
 ENV PATH="/opt/dockerenv/bin:$PATH"
 
 # Install system deps for pip requirements
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    python3-dev
+    cargo \
+    libffi-dev \
+    libjpeg-dev \
+    libpq-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    python3-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]

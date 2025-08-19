@@ -10,12 +10,10 @@ ENV PATH="/opt/dockerenv/bin:$PATH"
 # Install system deps for pip requirements
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libpq-dev \
-    libxml2-dev \
-    libxslt1-dev \
     python3-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "run.py"]
+CMD ["flask", "run", "--host=0.0.0.0", "--app", "myproject"]
