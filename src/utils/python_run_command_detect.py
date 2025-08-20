@@ -1,5 +1,5 @@
 import os
-
+from . import dependency_utils
 def check_for_django(py_files: list, requirements: list) -> tuple[bool, list]:
     for file in py_files:
         if os.path.basename(file) == "manage.py":
@@ -74,55 +74,21 @@ def list_python_files(start_dir):
         all_files.extend(py_files)
     return all_files
 
-def parse_pyproject_dependencies(path: str):
-    import tomllib
-
-    with open(path, "rb") as f:
-        data = tomllib.load(f)
-
-    # Case 1: PEP 621 standard
-    if "project" in data and "dependencies" in data["project"]:
-        return data["project"]["dependencies"]
-
-    # Case 2: Poetry
-    poetry_deps = data.get("tool", {}).get("poetry", {}).get("dependencies", {})
-    return [
-        f"{pkg}{ver if ver != '*' else ''}"
-        for pkg, ver in poetry_deps.items()
-        if pkg.lower() != "python"
-    ]
-    
-def parse_requirements_file_dependencies(path: str):
-    reqs = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                reqs.append(line)
-    return reqs
-
-def load_requirements(path=os.getcwd(), deps_type="requirements.txt"):
-    deps_filepath = os.path.join(path, deps_type)
-    if deps_type == "pyproject.toml":
-        return parse_pyproject_dependencies(deps_filepath)
-    else:
-        return parse_requirements_file_dependencies(deps_filepath)
-
 def determine_command(path: str, deps_type: str) -> list:
     project_files = list_python_files(path)
-    is_flask_app, flask_cmd = check_for_flask_app(project_files, load_requirements(path, deps_type)) # TODO: be compatible with project.toml 
+    is_flask_app, flask_cmd = check_for_flask_app(project_files, dependency_utils.load_requirements(path, deps_type))
     if is_flask_app:
         return flask_cmd
     else:
-        is_django_app, django_cmd = check_for_django(project_files, load_requirements(path, deps_type))
+        is_django_app, django_cmd = check_for_django(project_files, dependency_utils.load_requirements(path, deps_type))
         if is_django_app:
             return django_cmd
         else:
-            is_fastapi_app, fastapi_cmd = check_for_fastapi(project_files, load_requirements(path, deps_type))
+            is_fastapi_app, fastapi_cmd = check_for_fastapi(project_files, dependency_utils.load_requirements(path, deps_type))
             if is_fastapi_app:
                 return fastapi_cmd
             else:
-                is_celery_app, celery_cmd = check_for_celery(project_files, load_requirements(path, deps_type))
+                is_celery_app, celery_cmd = check_for_celery(project_files, dependency_utils.load_requirements(path, deps_type))
                 if is_celery_app:
                     return celery_cmd
                 else:

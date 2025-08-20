@@ -1,14 +1,7 @@
 import os
 import textwrap
-import sys
 
-from src.utils import pip_sys_generation, python_venv_generation, python_run_command_detect
-
-def system_python_version():
-    major = sys.version_info.major
-    minor = sys.version_info.minor
-
-    return f"{major}.{minor}"
+from src.utils import pip_sys_generation, python_venv_generation, python_run_command_detect, python_base_image_generate
 
 
 def generate(path: str, include_sysdeps=True, keep_alive=False) -> str:
@@ -19,8 +12,7 @@ def generate(path: str, include_sysdeps=True, keep_alive=False) -> str:
     else:
         deps = None
 
-    python_version = system_python_version()
-    base = f"python:{python_version}-slim"
+    base = python_base_image_generate.determine_base_image(f"{path}", deps)
 
     dockerfile = textwrap.dedent(f"""
         FROM {base} as build

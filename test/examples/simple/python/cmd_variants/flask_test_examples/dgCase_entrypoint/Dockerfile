@@ -8,11 +8,13 @@ RUN python3 -m venv /opt/dockerenv
 ENV PATH="/opt/dockerenv/bin:$PATH"
 
 # Install system deps for pip requirements
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     python3-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libffi-dev \
+    libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -8,8 +8,9 @@ RUN python3 -m venv /opt/dockerenv
 ENV PATH="/opt/dockerenv/bin:$PATH"
 
 # Install system deps for pip requirements
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gettext \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
