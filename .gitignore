@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# get rid of all dockerfiles here since they are generated so much
+*Dockerfile
+
 # C extensions
 *.so
 
